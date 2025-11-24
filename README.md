@@ -3,8 +3,6 @@
 Interactive tools to inspect and decode **LevelDB** databases and single **SST/LDB table files**.
 Designed for digital forensics training and classroom use.
 
-Adapted from the Protobuf Viewer README template.
-
 ---
 
 ## Tools
