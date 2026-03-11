@@ -118,7 +118,13 @@ def copy_db_to_temp(src_root: Path) -> Path:
 def read_leveldb_all(db_path: Path, prefix: Optional[bytes] = None, limit: Optional[int] = None) -> List[KVRow]:
     if not PLYVEL_OK:
         raise RuntimeError(f"plyvel not available: {PLYVEL_ERR}")
-    db = plyvel.DB(str(db_path), create_if_missing=False)
+
+    try:
+        db = plyvel.DB(str(db_path), create_if_missing=False)
+    except plyvel.Error as err:
+        if b"idb_cmp1 does not match existing comparator" not in err.args[0]:
+            raise err
+        db = plyvel.DB(str(db_path), create_if_missing=False, comparator=lambda a, b: (a > b) - (a < b), comparator_name=b"idb_cmp1")
     rows: List[KVRow] = []
     try:
         it = db.iterator(prefix=prefix) if prefix is not None else db.iterator()
